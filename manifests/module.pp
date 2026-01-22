@@ -50,14 +50,6 @@ define filebeat::module (
 
 
 
-
-
-
-
-
-
-
-
     default : {
       fail($filebeat::kernel_fail_message)
     }
