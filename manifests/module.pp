@@ -48,15 +48,15 @@ define filebeat::module (
       }
     }
 
-    'Windows' : {
-      file { "filebeat-module-${name}":
-        ensure  => $ensure,
-        path    => "${filebeat::modules_dir}/${name}.yml",
-        content => template("${module_name}/pure_hash.yml.erb"),
-        notify  => Service['filebeat'],
-        before  => File['filebeat.yml'],
-      }
-    }
+
+
+
+
+
+
+
+
+
 
     default : {
       fail($filebeat::kernel_fail_message)
