@@ -8,27 +8,6 @@ class filebeat::repo {
   $yum_repo_url = "https://artifacts.elastic.co/packages/${filebeat::major_version}.x/yum"
 
   case $facts['os']['family'] {
-    'Debian': {
-      if $filebeat::manage_apt == true {
-        include apt
-      }
-
-      Class['apt::update'] -> Package['filebeat']
-
-      if !defined(Apt::Source['beats']) {
-        apt::source { 'beats':
-          ensure   => $filebeat::alternate_ensure,
-          location => $debian_repo_url,
-          release  => 'stable',
-          repos    => 'main',
-          pin      => $filebeat::repo_priority,
-          key      => {
-            name   => 'elastic-archive-keyring.gpg',
-            source => 'https://artifacts.elastic.co/GPG-KEY-elasticsearch',
-          },
-        }
-      }
-    }
     'RedHat', 'Linux': {
       if !defined(Yumrepo['beats']) {
         yumrepo { 'beats':
@@ -47,25 +26,6 @@ class filebeat::repo {
         command     => 'yum clean all',
         refreshonly => true,
         path        => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
-      }
-    }
-    'Suse': {
-      exec { 'topbeat_suse_import_gpg':
-        command => 'rpmkeys --import https://artifacts.elastic.co/GPG-KEY-elasticsearch',
-        unless  => 'test $(rpm -qa gpg-pubkey | grep -i "D88E42B4" | wc -l) -eq 1 ',
-        notify  => [Zypprepo['beats']],
-      }
-      if !defined(Zypprepo['beats']) {
-        zypprepo { 'beats':
-          ensure      => $filebeat::alternate_ensure,
-          baseurl     => $yum_repo_url,
-          enabled     => 1,
-          autorefresh => 1,
-          name        => 'beats',
-          gpgcheck    => 1,
-          gpgkey      => 'https://packages.elastic.co/GPG-KEY-elasticsearch',
-          type        => 'yum',
-        }
       }
     }
     default: {

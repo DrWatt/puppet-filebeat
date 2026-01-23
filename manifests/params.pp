@@ -50,34 +50,6 @@ class filebeat::params {
   #   $conf_template = "${module_name}/filebeat.yml.erb"
   # }
   #
-
-  # Archlinux and OpenBSD have proper packages in the official repos
-  # we shouldn't manage the repo on them
-  case $facts['os']['family'] {
-    'Archlinux': {
-      $manage_repo = false
-      $manage_apt  = false
-      $filebeat_path = '/usr/bin/filebeat'
-      $major_version = '7'
-    }
-    'OpenBSD': {
-      $manage_repo = false
-      $manage_apt  = false
-      $filebeat_path = '/usr/local/bin/filebeat'
-      # lint:ignore:only_variable_string
-      $major_version = versioncmp('6.3', $facts['kernelversion']) < 0 ? {
-        # lint:endignore
-        true    => '6',
-        default => '5'
-      }
-    }
-    default: {
-      $manage_repo = true
-      $manage_apt  = true
-      $filebeat_path = '/usr/share/filebeat/bin/filebeat'
-      $major_version = '9'
-    }
-  }
   case $facts['kernel'] {
     'Linux'   : {
       $package_ensure    = present
@@ -101,71 +73,6 @@ class filebeat::params {
       }
       $url_arch        = undef
     }
-
-    'SunOS': {
-      $package_ensure    = present
-      $config_file       = '/opt/local/etc/beats/filebeat.yml'
-      $config_dir        = '/opt/local/etc/filebeat.d'
-      $config_file_owner = 'root'
-      $config_file_group = 'root'
-      $config_dir_owner  = 'root'
-      $config_dir_group  = 'root'
-      $modules_dir       = '/opt/local/etc/filebeat.modules.d'
-      $tmp_dir           = '/tmp'
-      $service_provider  = undef
-      $install_dir       = undef
-      $url_arch          = undef
-    }
-
-    'FreeBSD': {
-      $package_ensure    = present
-      $config_file       = '/usr/local/etc/beats/filebeat.yml'
-      $config_dir        = '/usr/local/etc/beats/filebeat.d'
-      $config_file_owner = 'root'
-      $config_file_group = 'wheel'
-      $config_dir_owner  = 'root'
-      $config_dir_group  = 'wheel'
-      $modules_dir       = '/usr/local/etc/beats/filebeat.modules.d'
-      $tmp_dir           = '/tmp'
-      $service_provider  = undef
-      $install_dir       = undef
-      $url_arch          = undef
-    }
-
-    'OpenBSD': {
-      $package_ensure    = present
-      $config_file       = '/etc/filebeat/filebeat.yml'
-      $config_dir        = '/etc/filebeat/conf.d'
-      $config_file_owner = 'root'
-      $config_file_group = 'wheel'
-      $config_dir_owner  = 'root'
-      $config_dir_group  = 'wheel'
-      $modules_dir        = '/etc/filebeat/modules.d'
-      $tmp_dir           = '/tmp'
-      $service_provider  = undef
-      $install_dir       = undef
-      $url_arch          = undef
-    }
-
-    'Windows' : {
-      $package_ensure   = '7.1.0'
-      $config_file_owner = 'Administrator'
-      $config_file_group = undef
-      $config_dir_owner = 'Administrator'
-      $config_dir_group = undef
-      $config_file      = 'C:/Program Files/Filebeat/filebeat.yml'
-      $config_dir       = 'C:/Program Files/Filebeat/conf.d'
-      $modules_dir      = 'C:/Program Files/Filebeat/modules.d'
-      $install_dir      = 'C:/Program Files'
-      $tmp_dir          = 'C:/Windows/Temp'
-      $service_provider = undef
-      $url_arch         = $facts['os']['architecture'] ? {
-        'x86'   => 'x86',
-        'x64'   => 'x86_64',
-        default => fail("${facts['os']['architecture']} is not supported by filebeat."),
-      }
-    }
-
     default : {
       fail($kernel_fail_message)
     }

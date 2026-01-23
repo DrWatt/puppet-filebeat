@@ -15,28 +15,6 @@ class filebeat::install {
       }
       contain filebeat::install::linux
     }
-    'SunOS': {
-      class { 'filebeat::install::sunos':
-        notify => Class['filebeat::service'],
-      }
-      contain filebeat::install::sunos
-    }
-    'FreeBSD': {
-      class { 'filebeat::install::freebsd':
-        notify => Class['filebeat::service'],
-      }
-      contain filebeat::install::freebsd
-    }
-    'OpenBSD': {
-      class { 'filebeat::install::openbsd': }
-      contain filebeat::install::openbsd
-    }
-    'Windows': {
-      class { 'filebeat::install::windows':
-        notify => Class['filebeat::service'],
-      }
-      contain filebeat::install::windows
-    }
     default:   {
       fail($filebeat::kernel_fail_message)
     }

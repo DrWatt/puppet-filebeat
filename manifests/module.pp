@@ -22,7 +22,7 @@ define filebeat::module (
   $filebeat_config = [{ 'module' => $name } + $config]
 
   case $facts['kernel'] {
-    'Linux', 'OpenBSD' : {
+    'Linux' : {
       file { "filebeat-module-${name}":
         ensure  => $ensure,
         path    => "${filebeat::modules_dir}/${name}.yml",
@@ -34,22 +34,6 @@ define filebeat::module (
         before  => File['filebeat.yml'],
       }
     }
-
-    'FreeBSD' : {
-      file { "filebeat-module-${name}":
-        ensure  => $ensure,
-        path    => "${filebeat::modules_dir}/${name}.yml",
-        owner   => 'root',
-        group   => 'wheel',
-        mode    => $filebeat::config_file_mode,
-        content => template("${module_name}/pure_hash.yml.erb"),
-        notify  => Service['filebeat'],
-        before  => File['filebeat.yml'],
-      }
-    }
-
-
-
     default : {
       fail($filebeat::kernel_fail_message)
     }
