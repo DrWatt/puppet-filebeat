@@ -50,6 +50,10 @@ class filebeat::params {
   #   $conf_template = "${module_name}/filebeat.yml.erb"
   # }
   #
+  $manage_repo = true
+  $manage_apt  = true
+  $filebeat_path = '/usr/share/filebeat/bin/filebeat'
+
   case $facts['kernel'] {
     'Linux'   : {
       $package_ensure    = present
