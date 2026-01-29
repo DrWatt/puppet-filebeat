@@ -11,8 +11,8 @@ describe 'filebeat::module::auditd' do
     {
       kernel: 'Linux',
       os: {
-        family: 'Debian',
-        name: 'Ubuntu',
+        family: 'RedHat',
+        name: 'AlmaLinux',
       }
     }
   end
