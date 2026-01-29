@@ -533,6 +533,7 @@ class {'filebeat':
       'keepfiles'   => '7',
       'permissions' => '0644'
     },
+  },
   systemd_beat_log_opts_override => "",
 }
 ```
