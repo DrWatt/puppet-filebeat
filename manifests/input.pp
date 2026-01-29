@@ -264,17 +264,6 @@ define filebeat::input (
         require      => File['filebeat.yml'],
       }
     }
-
-      file { "filebeat-${name}":
-        ensure       => $ensure,
-        path         => "${filebeat::config_dir}/${name}.yml",
-        content      => template("${module_name}/${input_template}"),
-        validate_cmd => $validate_cmd,
-        notify       => Service['filebeat'],
-        require      => File['filebeat.yml'],
-      }
-    }
-
     default : {
       fail($filebeat::kernel_fail_message)
     }
