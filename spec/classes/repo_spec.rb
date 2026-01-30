@@ -6,7 +6,7 @@ describe 'filebeat::repo' do
       let(:facts) { os_facts }
       let(:pre_condition) { "class { 'filebeat': major_version => '#{major_version}' }" }
 
-      [5, 6].each do |version|
+      [6, 7, 8, 9].each do |version|
         context "with $major_version == #{version}" do
           let(:major_version) { version }
 

@@ -80,10 +80,7 @@ class filebeat::config {
     'Linux'   : {
       $validate_cmd = ($filebeat::disable_config_test or $skip_validation) ? {
         true    => undef,
-        default => $major_version ? {
-          '5'     => "${filebeat::filebeat_path} ${filebeat::extra_validate_options} -N -configtest -c %",
-          default => "${filebeat::filebeat_path} ${filebeat::extra_validate_options} -c % test config",
-        },
+        default => "${filebeat::filebeat_path} ${filebeat::extra_validate_options} -c % test config",
       }
 
       file { 'filebeat.yml':

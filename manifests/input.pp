@@ -227,19 +227,13 @@ define filebeat::input (
   Optional[String] $index                  = undef,
   Boolean $publisher_pipeline_disable_host = false,
 ) {
+  $input_template = 'input.yml.erb'
   if 'filebeat_version' in $facts and $facts['filebeat_version'] != false {
-    if versioncmp($facts['filebeat_version'], '6') > 0 {
-      $input_template = 'input.yml.erb'
-    } else {
-      $input_template = 'prospector.yml.erb'
-    }
-
     $skip_validation = versioncmp($facts['filebeat_version'], $filebeat::major_version) ? {
       -1      => true,
       default => false,
     }
   } else {
-    $input_template = 'input.yml.erb'
     $skip_validation = false
   }
 
@@ -247,10 +241,7 @@ define filebeat::input (
     'Linux' : {
       $validate_cmd = ($filebeat::disable_config_test or $skip_validation) ? {
         true    => undef,
-        default => $filebeat::major_version ? {
-          '5'     => "${filebeat::filebeat_path} -N -configtest -c %",
-          default => "${filebeat::filebeat_path} -c ${filebeat::config_file} test config",
-        },
+        default => "${filebeat::filebeat_path} -c ${filebeat::config_file} test config",
       }
       file { "filebeat-${name}":
         ensure       => $ensure,

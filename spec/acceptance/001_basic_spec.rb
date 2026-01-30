@@ -55,7 +55,7 @@ describe 'filebeat class' do
           keepfiles => 7,
         }
       },
-      prospectors => {
+      inputs => {
         'system-logs' => {
           doc_type => 'system',
           paths    => [
@@ -74,13 +74,6 @@ describe 'filebeat class' do
       }
     }
     HEREDOC
-  end
-
-  context 'with $major_version = 5' do
-    let(:major_version) { 5 }
-
-    it_behaves_like 'an idempotent resource'
-    include_examples 'filebeat'
   end
 
   context 'with $major_version = 6' do
