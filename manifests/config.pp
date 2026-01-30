@@ -17,90 +17,56 @@ class filebeat::config {
     $setup = $filebeat::setup
   }
 
-  if versioncmp($major_version, '6') >= 0 {
-    $filebeat_config_temp = delete_undef_values({
-        'name'              => $filebeat::beat_name,
-        'tags'              => $filebeat::tags,
-        'max_procs'         => $filebeat::max_procs,
-        'fields'            => $filebeat::fields,
-        'fields_under_root' => $filebeat::fields_under_root,
-        'filebeat'          => {
-          'config.inputs' => {
-            'enabled' => true,
-            'path'    => "${filebeat::config_dir}/*.yml",
-          },
-          'config.modules' => {
-            'enabled' => $filebeat::enable_conf_modules,
-            'path'    => "${filebeat::modules_dir}/*.yml",
-          },
-          'modules'             => $filebeat::modules,
-          'overwrite_pipelines' => $filebeat::overwrite_pipelines,
-          'shutdown_timeout'    => $filebeat::shutdown_timeout,
-          'registry'            => {
-            'path'             => $filebeat::registry_path,
-            'file_permissions' => $filebeat::registry_file_permissions,
-            'flush'            => $filebeat::registry_flush,
-          },
-          'autodiscover'      => $filebeat::autodiscover,
+  $filebeat_config_temp = delete_undef_values({
+      'name'              => $filebeat::beat_name,
+      'tags'              => $filebeat::tags,
+      'max_procs'         => $filebeat::max_procs,
+      'fields'            => $filebeat::fields,
+      'fields_under_root' => $filebeat::fields_under_root,
+      'filebeat'          => {
+        'config.inputs' => {
+          'enabled' => true,
+          'path'    => "${filebeat::config_dir}/*.yml",
         },
-        'http'              => $filebeat::http,
-        'cloud'             => $filebeat::cloud,
-        'queue'             => $filebeat::queue,
-        'output'            => $filebeat::outputs,
-        'shipper'           => $filebeat::shipper,
-        'logging'           => $filebeat::logging,
-        'runoptions'        => $filebeat::run_options,
-        'processors'        => $filebeat::processors,
-        'monitoring'        => $filebeat::monitoring,
-        'setup'             => $setup,
-    })
-    # Add the 'xpack' section if supported (version >= 6.1.0) and not undef
-    if $filebeat::xpack and versioncmp($filebeat::package_ensure, '6.1.0') >= 0 {
-      $filebeat_config_xpack = deep_merge($filebeat_config_temp, { 'xpack' => $filebeat::xpack })
-    }
-    else {
-      $filebeat_config_xpack = $filebeat_config_temp
-    }
-    # Add the 'features' section if supported (version >= 8.7.0) and not undef
-    if $filebeat::features and versioncmp($filebeat::package_ensure, '8.7.0') >= 0 {
-      $filebeat_config = deep_merge($filebeat_config_xpack, { 'features' => $filebeat::features })
-    }
-    else {
-      $filebeat_config = $filebeat_config_xpack
-    }
-  } else {
-    $filebeat_config_temp = delete_undef_values({
-        'shutdown_timeout'  => $filebeat::shutdown_timeout,
-        'name'              => $filebeat::beat_name,
-        'tags'              => $filebeat::tags,
-        'queue_size'        => $filebeat::queue_size,
-        'max_procs'         => $filebeat::max_procs,
-        'fields'            => $filebeat::fields,
-        'fields_under_root' => $filebeat::fields_under_root,
-        'filebeat'          => {
-          'config_dir'          => $filebeat::config_dir,
-          'idle_timeout'        => $filebeat::idle_timeout,
-          'overwrite_pipelines' => $filebeat::overwrite_pipelines,
-          'publish_async'       => $filebeat::publish_async,
-          'registry_file'       => $filebeat::registry_file,
-          'shutdown_timeout'    => $filebeat::shutdown_timeout,
-          'spool_size'          => $filebeat::spool_size,
+        'config.modules' => {
+          'enabled' => $filebeat::enable_conf_modules,
+          'path'    => "${filebeat::modules_dir}/*.yml",
         },
-        'output'            => $filebeat::outputs,
-        'shipper'           => $filebeat::shipper,
-        'logging'           => $filebeat::logging,
-        'runoptions'        => $filebeat::run_options,
-        'processors'        => $filebeat::processors,
-    })
-    # Add the 'modules' section if supported (version >= 5.2.0)
-    if versioncmp($filebeat::package_ensure, '5.2.0') >= 0 {
-      $filebeat_config = deep_merge($filebeat_config_temp, { 'modules' => $filebeat::modules })
-    }
-    else {
-      $filebeat_config = $filebeat_config_temp
-    }
+        'modules'             => $filebeat::modules,
+        'overwrite_pipelines' => $filebeat::overwrite_pipelines,
+        'shutdown_timeout'    => $filebeat::shutdown_timeout,
+        'registry'            => {
+          'path'             => $filebeat::registry_path,
+          'file_permissions' => $filebeat::registry_file_permissions,
+          'flush'            => $filebeat::registry_flush,
+        },
+        'autodiscover'      => $filebeat::autodiscover,
+      },
+      'http'              => $filebeat::http,
+      'cloud'             => $filebeat::cloud,
+      'queue'             => $filebeat::queue,
+      'output'            => $filebeat::outputs,
+      'shipper'           => $filebeat::shipper,
+      'logging'           => $filebeat::logging,
+      'runoptions'        => $filebeat::run_options,
+      'processors'        => $filebeat::processors,
+      'monitoring'        => $filebeat::monitoring,
+      'setup'             => $setup,
+  })
+  # Add the 'xpack' section if supported (version >= 6.1.0) and not undef
+  if $filebeat::xpack and versioncmp($filebeat::package_ensure, '6.1.0') >= 0 {
+    $filebeat_config_xpack = deep_merge($filebeat_config_temp, { 'xpack' => $filebeat::xpack })
   }
-
+  else {
+    $filebeat_config_xpack = $filebeat_config_temp
+  }
+  # Add the 'features' section if supported (version >= 8.7.0) and not undef
+  if $filebeat::features and versioncmp($filebeat::package_ensure, '8.7.0') >= 0 {
+    $filebeat_config = deep_merge($filebeat_config_xpack, { 'features' => $filebeat::features })
+  }
+  else {
+    $filebeat_config = $filebeat_config_xpack
+  }
   if 'filebeat_version' in $facts and $facts['filebeat_version'] != false {
     $skip_validation = versioncmp($facts['filebeat_version'], $filebeat::major_version) ? {
       -1      => true,
